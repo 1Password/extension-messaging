@@ -1,0 +1,16 @@
+{
+  "name": "External Message Testing",
+  "short_name": "1Password",
+  "author": "AgileBits",
+  "description": "Extension for testing the chrome.runtime.onMessageExternal API.",
+  "version": "0.0.1",
+  "manifest_version": 2,
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAzcOhtMsdZmqmlsAH0WMVsIbEAIgnzHJ/2q3XMRwoFBxZJevuY/Uzu4cl+ZoGrX4HYqXV3efOaSD37a2ArZuHcH+sMSxQo4opIkkh37twhSx9PeGGrkPH3BXcgHufSBkfOryeEJ7AEwvEfNLIMYiP7+vFQnPftq9CtMPwL8BOPxJdYWnlylCGO4DM/sCvdvIIJgK8WXRTFyBjZ0cn/J//8gOCjeoKabFAtikya72VDVAQ51EMqVvHGUkcr/H867wAydxBFlMsRkjdgZf2Rlql8Qb7SkcyWE1CrvEq10zQc4tey7/T5jiF/xv5d0YvcX1EcksvZaK74T8t+ujsrt+G2QIDAQAB",
+  "background": {
+    "scripts": [
+      "background.js"
+    ]
+  },
+  "permissions": [],
+  "minimum_chrome_version": "73"
+}
