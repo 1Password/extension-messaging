@@ -1,6 +1,7 @@
 import * as t from "io-ts";
 import { AutocompleteType } from "./autocomplete";
 import { CategoryUuid } from "./category";
+export { isOPInstalled } from "./helpers";
 
 export const SaveRequestCodec = t.readonly(
   t.strict({

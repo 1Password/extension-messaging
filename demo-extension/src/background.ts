@@ -1,4 +1,4 @@
-import { ExtensionRequest } from "@1password/extension-types";
+import { ExtensionRequest, isOPInstalled } from "@1password/extension-types";
 
 function sendExternalMessage(extensionId: string, message: ExtensionRequest) {
   chrome.runtime.sendMessage(
@@ -8,10 +8,6 @@ function sendExternalMessage(extensionId: string, message: ExtensionRequest) {
       console.log("Response:", response);
     }
   );
-}
-
-function sendHello(extensionId: string) {
-  sendExternalMessage(extensionId, { name: "hello" });
 }
 
 function sendCreateItem(extensionId: string) {
@@ -33,6 +29,6 @@ function sendCreateItem(extensionId: string) {
 
 // Expose functions for easy messaging
 (window as any).messaging = {
-  sendHello,
+  isOPInstalled,
   sendCreateItem,
 };
