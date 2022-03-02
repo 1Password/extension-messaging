@@ -26,6 +26,7 @@ function sendCreateItem(extensionId: string) {
         ],
         notes: "Item saved while testing the integration.",
       },
+      type: "001",
     },
   });
 }
