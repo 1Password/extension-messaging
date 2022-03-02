@@ -59,4 +59,8 @@ export const AutocompleteType = t.union([
   t.literal("tel-extension"),
   t.literal("email"),
   t.literal("impp"),
+
+  /** 1Password added types */
+  t.literal("crypto-address"),
+  t.literal("crypto-recovery-seed"),
 ]);

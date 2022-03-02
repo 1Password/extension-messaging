@@ -1,5 +1,6 @@
 import * as t from "io-ts";
 import { AutocompleteType } from "./autocomplete";
+import { CategoryUuid } from "./category";
 
 export const SaveRequestCodec = t.readonly(
   t.strict({
@@ -18,6 +19,7 @@ export const SaveRequestCodec = t.readonly(
 
 export const CreateItemDataCodec = t.readonly(
   t.strict({
+    type: CategoryUuid,
     saveRequest: SaveRequestCodec,
   })
 );
