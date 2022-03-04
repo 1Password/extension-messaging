@@ -1,4 +1,11 @@
-import { ExtensionRequest, ExtensionResponse } from "./index";
+import * as t from "io-ts";
+import {
+  ExtensionRequest,
+  ExtensionResponse,
+  SaveRequestCodec,
+  CreateItemResponseDataCodec,
+} from "./index";
+import { CategoryReadable, CategoryUuidDictionary } from "./category";
 
 const OPExtensions = [
   "dppgmdbiimibapkepcbdbmkaabgiofem",
@@ -39,4 +46,25 @@ function sendExternalMessage(
       reject("not found");
     }
   });
+}
+
+export async function createOPItem(
+  extensionId: string,
+  saveRequest: t.TypeOf<typeof SaveRequestCodec>,
+  itemType: t.TypeOf<typeof CategoryReadable>
+): Promise<t.TypeOf<typeof CreateItemResponseDataCodec>> {
+  if (CategoryUuidDictionary[itemType]) {
+    const categoryUuid = CategoryUuidDictionary[itemType];
+    const response = (await sendExternalMessage(extensionId, {
+      name: "create-item",
+      data: {
+        saveRequest,
+        type: categoryUuid,
+      },
+    })) as unknown;
+    return response as t.TypeOf<typeof CreateItemResponseDataCodec>;
+  } else {
+    console.error("Item type not valid, must be {our types}");
+    return { saved: false };
+  }
 }
