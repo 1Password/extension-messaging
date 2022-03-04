@@ -64,7 +64,11 @@ export async function createOPItem(
     })) as unknown;
     return response as t.TypeOf<typeof CreateItemResponseDataCodec>;
   } else {
-    console.error("Item type not valid, must be {our types}");
+    console.error(
+      `Item type not valid, must be one of the following: ${CategoryReadable.types
+        .map((type) => type.value)
+        .join(", ")}`
+    );
     return { saved: false };
   }
 }
