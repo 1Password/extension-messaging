@@ -1,10 +1,12 @@
 import * as t from "io-ts";
 import {
-  CreateItemDataCodec,
-  EncryptedValueCodec,
   ExtensionRequest,
   ExtensionResponse,
+  SaveRequestCodec,
+  CreateItemResponseDataCodec,
+  EncryptedValueCodec,
 } from "./index";
+import { CategoryReadable, CategoryUuidDictionary } from "./category";
 
 const OPExtensions = [
   "dppgmdbiimibapkepcbdbmkaabgiofem",
@@ -35,16 +37,6 @@ export const isOPInstalled = async (minimumExtensionVersion?: number) => {
     } catch {}
   }
   return false;
-};
-
-export const createOpItem = async (
-  extensionId: string,
-  data: t.TypeOf<typeof CreateItemDataCodec>
-): Promise<Extract<ExtensionResponse, { name: "create-item" }>> => {
-  return await sendExternalMessage(extensionId, {
-    name: "create-item",
-    data,
-  });
 };
 
 export const encryptValue = async (
@@ -104,4 +96,29 @@ function sendExternalMessage<
       reject("not found");
     }
   });
+}
+
+export async function createOPItem(
+  extensionId: string,
+  saveRequest: t.TypeOf<typeof SaveRequestCodec>,
+  itemType: t.TypeOf<typeof CategoryReadable>
+): Promise<t.TypeOf<typeof CreateItemResponseDataCodec>> {
+  if (CategoryUuidDictionary[itemType]) {
+    const categoryUuid = CategoryUuidDictionary[itemType];
+    const response = (await sendExternalMessage(extensionId, {
+      name: "create-item",
+      data: {
+        saveRequest,
+        type: categoryUuid,
+      },
+    })) as unknown;
+    return response as t.TypeOf<typeof CreateItemResponseDataCodec>;
+  } else {
+    console.error(
+      `Item type not valid, must be one of the following: ${CategoryReadable.types
+        .map((type) => type.value)
+        .join(", ")}`
+    );
+    return { saved: false };
+  }
 }

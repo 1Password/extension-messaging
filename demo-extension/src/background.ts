@@ -1,9 +1,14 @@
-import { isOPInstalled, createOpItem } from "@1password/extension-types";
 import { encryptValue } from "@1password/extension-types/src/helpers";
+import {
+  ExtensionRequest,
+  isOPInstalled,
+  createOPItem,
+} from "@1password/extension-types";
 
 function sendCreateItem(extensionId: string) {
-  return createOpItem(extensionId, {
-    saveRequest: {
+  return createOPItem(
+    extensionId,
+    {
       title: "Sample Item",
       fields: [
         { autocomplete: "username", value: "wendy.appleseed@1password.com" },
@@ -11,8 +16,8 @@ function sendCreateItem(extensionId: string) {
       ],
       notes: "Item saved while testing the integration.",
     },
-    type: "001",
-  });
+    "login"
+  );
 }
 
 async function sendCreateCryptoItem(extensionId: string) {
@@ -25,8 +30,9 @@ async function sendCreateCryptoItem(extensionId: string) {
     ])
   );
 
-  return createOpItem(extensionId, {
-    saveRequest: {
+  return createOPItem(
+    extensionId,
+    {
       title: "Sample Crypto Wallet",
       fields: [
         { autocomplete: "crypto-address", value: "address-goes-here" },
@@ -37,8 +43,8 @@ async function sendCreateCryptoItem(extensionId: string) {
       ],
       notes: "Item saved while testing the integration.",
     },
-    type: "115",
-  });
+    "crypto-wallet"
+  );
 }
 
 // Expose functions for easy messaging
