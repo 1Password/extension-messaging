@@ -16,6 +16,8 @@ const OPExtensions = [
   "{25fc87fa-4d31-4fee-b5c1-c32a7844c063}",
 ];
 
+/** Public API */
+
 export const isOPInstalled = async (minimumExtensionVersion?: number) => {
   for (const extension of OPExtensions) {
     try {
@@ -77,31 +79,10 @@ export const encryptValue = async (
   }
 };
 
-function sendExternalMessage<
-  Request extends ExtensionRequest,
-  Response extends Extract<ExtensionResponse, { name: Request["name"] }>
->(extensionId: string, message: Request): Promise<Response> {
-  return new Promise<Response>((resolve, reject) => {
-    // TODO add timeout / reject
-    try {
-      chrome.runtime.sendMessage(
-        extensionId,
-        JSON.stringify(message),
-        (response) => {
-          // console.log("Response:", response);
-          resolve(response);
-        }
-      );
-    } catch {
-      reject("not found");
-    }
-  });
-}
-
 export async function createOPItem(
   extensionId: string,
-  saveRequest: t.TypeOf<typeof SaveRequestCodec>,
-  itemType: t.TypeOf<typeof CategoryReadable>
+  itemType: t.TypeOf<typeof CategoryReadable>,
+  saveRequest: t.TypeOf<typeof SaveRequestCodec>
 ): Promise<t.TypeOf<typeof CreateItemResponseDataCodec>> {
   if (CategoryUuidDictionary[itemType]) {
     const categoryUuid = CategoryUuidDictionary[itemType];
@@ -121,4 +102,27 @@ export async function createOPItem(
     );
     return { saved: false };
   }
+}
+
+/** Helpers */
+
+function sendExternalMessage<
+  Request extends ExtensionRequest,
+  Response extends Extract<ExtensionResponse, { name: Request["name"] }>
+>(extensionId: string, message: Request): Promise<Response> {
+  return new Promise<Response>((resolve, reject) => {
+    // TODO add timeout / reject
+    try {
+      chrome.runtime.sendMessage(
+        extensionId,
+        JSON.stringify(message),
+        (response) => {
+          // console.log("Response:", response);
+          resolve(response);
+        }
+      );
+    } catch {
+      reject("not found");
+    }
+  });
 }
