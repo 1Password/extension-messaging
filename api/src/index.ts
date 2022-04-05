@@ -71,6 +71,37 @@ export const CreateItemResponseDataCodec = t.readonly(
   })
 );
 
+export const RsaOtherPrimeInfoCodec = t.readonly(
+  t.strict({
+    d: t.union([t.string, t.undefined]),
+    r: t.union([t.string, t.undefined]),
+    t: t.union([t.string, t.undefined]),
+  })
+);
+
+export const GetEncryptionKeyDataCodec = t.readonly(
+  t.strict({
+    alg: t.union([t.string, t.undefined]),
+    crv: t.union([t.string, t.undefined]),
+    d: t.union([t.string, t.undefined]),
+    dp: t.union([t.string, t.undefined]),
+    dq: t.union([t.string, t.undefined]),
+    e: t.union([t.string, t.undefined]),
+    ext: t.union([t.boolean, t.undefined]),
+    k: t.union([t.string, t.undefined]),
+    key_ops: t.union([t.array(t.string), t.undefined]),
+    kty: t.union([t.string, t.undefined]),
+    n: t.union([t.string, t.undefined]),
+    oth: t.union([t.array(RsaOtherPrimeInfoCodec), t.undefined]),
+    p: t.union([t.string, t.undefined]),
+    q: t.union([t.string, t.undefined]),
+    qi: t.union([t.string, t.undefined]),
+    use: t.union([t.string, t.undefined]),
+    x: t.union([t.string, t.undefined]),
+    y: t.union([t.string, t.undefined]),
+  })
+);
+
 export const ExtensionResponseCodec = t.union([
   t.readonly(
     t.strict({
@@ -87,7 +118,7 @@ export const ExtensionResponseCodec = t.union([
   t.readonly(
     t.strict({
       name: t.literal("get-encryption-key"),
-      data: t.string,
+      data: GetEncryptionKeyDataCodec,
     })
   ),
 ]);

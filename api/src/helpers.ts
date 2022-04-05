@@ -1,6 +1,7 @@
 import * as t from "io-ts";
 import {
   CreateItemDataCodec,
+  EncryptedValueCodec,
   ExtensionRequest,
   ExtensionResponse,
 } from "./index";
@@ -44,6 +45,44 @@ export const createOpItem = async (
     name: "create-item",
     data,
   });
+};
+
+export const encryptValue = async (
+  extensionId: string,
+  value: Uint8Array
+): Promise<t.TypeOf<typeof EncryptedValueCodec>> => {
+  try {
+    const encryptionKeyResponse = await sendExternalMessage(extensionId, {
+      name: "get-encryption-key",
+    });
+
+    const cryptoKey = await window.crypto.subtle.importKey(
+      "jwk",
+      encryptionKeyResponse.data,
+      {
+        name: "RSA-OAEP",
+        hash: { name: "SHA-1" },
+      },
+      true,
+      ["encrypt"]
+    );
+
+    const encryptResult = await window.crypto.subtle.encrypt(
+      "RSA-OAEP",
+      cryptoKey,
+      value
+    );
+    const encryptedValue = new TextDecoder().decode(
+      new Uint8Array(encryptResult)
+    );
+
+    return {
+      type: "encrypted",
+      value: encryptedValue,
+    };
+  } catch {
+    throw new Error("Unable to encrypt value provided");
+  }
 };
 
 function sendExternalMessage<
