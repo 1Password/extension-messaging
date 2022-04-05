@@ -8,11 +8,22 @@ const OPExtensions = [
   "{25fc87fa-4d31-4fee-b5c1-c32a7844c063}",
 ];
 
-export const isOPInstalled = async () => {
+export const isOPInstalled = async (minimumExtensionVersion?: number) => {
   for (const extension of OPExtensions) {
     try {
-      const hasOP = await sendExternalMessage(extension, { name: "hello" });
-      if (hasOP) {
+      const helloResponse = await sendExternalMessage(extension, {
+        name: "hello",
+      });
+
+      if (helloResponse) {
+        // If the extension found does not meet the minimum version then continue to the next
+        if (
+          typeof minimumExtensionVersion === "number" &&
+          minimumExtensionVersion < helloResponse.data.buildNumber
+        ) {
+          continue;
+        }
+
         return true;
       }
     } catch {}
@@ -20,11 +31,11 @@ export const isOPInstalled = async () => {
   return false;
 };
 
-function sendExternalMessage(
-  extensionId: string,
-  message: ExtensionRequest
-): Promise<ExtensionResponse> {
-  return new Promise<ExtensionResponse>((resolve, reject) => {
+function sendExternalMessage<
+  Request extends ExtensionRequest,
+  Response extends Extract<ExtensionResponse, { name: Request["name"] }>
+>(extensionId: string, message: Request): Promise<Response> {
+  return new Promise<Response>((resolve, reject) => {
     // TODO add timeout / reject
     try {
       chrome.runtime.sendMessage(
