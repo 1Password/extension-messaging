@@ -3,6 +3,13 @@ import { AutocompleteType } from "./autocomplete";
 import { CategoryUuid } from "./category";
 export { isOPInstalled } from "./helpers";
 
+export const EncryptedValueCodec = t.readonly(
+  t.strict({
+    type: t.literal("encrypted"),
+    value: t.string,
+  })
+);
+
 export const SaveRequestCodec = t.readonly(
   t.strict({
     title: t.string,
@@ -10,7 +17,7 @@ export const SaveRequestCodec = t.readonly(
       t.readonly(
         t.strict({
           autocomplete: AutocompleteType,
-          value: t.union([t.string, t.undefined]),
+          value: t.union([t.string, EncryptedValueCodec, t.undefined]),
         })
       )
     ),
@@ -43,6 +50,11 @@ export const ExtensionRequestCodec = t.union([
       data: CreateItemDataCodec,
     })
   ),
+  t.readonly(
+    t.strict({
+      name: t.literal("get-encryption-key"),
+    })
+  ),
 ]);
 
 export type ExtensionRequest = t.TypeOf<typeof ExtensionRequestCodec>;
@@ -70,6 +82,12 @@ export const ExtensionResponseCodec = t.union([
     t.strict({
       name: t.literal("create-item"),
       data: CreateItemResponseDataCodec,
+    })
+  ),
+  t.readonly(
+    t.strict({
+      name: t.literal("get-encryption-key"),
+      data: t.string,
     })
   ),
 ]);
