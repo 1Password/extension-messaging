@@ -1,7 +1,7 @@
 import * as t from "io-ts";
 import { AutocompleteType } from "./autocomplete";
 import { CategoryUuid } from "./category";
-export { isOPInstalled } from "./helpers";
+export { isOPInstalled, createOpItem } from "./helpers";
 
 export const EncryptedValueCodec = t.readonly(
   t.strict({

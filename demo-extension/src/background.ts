@@ -1,29 +1,16 @@
-import { ExtensionRequest, isOPInstalled } from "@1password/extension-types";
-
-function sendExternalMessage(extensionId: string, message: ExtensionRequest) {
-  chrome.runtime.sendMessage(
-    extensionId,
-    JSON.stringify(message),
-    (response) => {
-      console.log("Response:", response);
-    }
-  );
-}
+import { isOPInstalled, createOpItem } from "@1password/extension-types";
 
 function sendCreateItem(extensionId: string) {
-  sendExternalMessage(extensionId, {
-    name: "create-item",
-    data: {
-      saveRequest: {
-        title: "Sample Item",
-        fields: [
-          { autocomplete: "username", value: "wendy.appleseed@1password.com" },
-          { autocomplete: "current-password", value: "its-a-secret" },
-        ],
-        notes: "Item saved while testing the integration.",
-      },
-      type: "001",
+  return createOpItem(extensionId, {
+    saveRequest: {
+      title: "Sample Item",
+      fields: [
+        { autocomplete: "username", value: "wendy.appleseed@1password.com" },
+        { autocomplete: "current-password", value: "its-a-secret" },
+      ],
+      notes: "Item saved while testing the integration.",
     },
+    type: "001",
   });
 }
 

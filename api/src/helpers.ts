@@ -1,4 +1,9 @@
-import { ExtensionRequest, ExtensionResponse } from "./index";
+import * as t from "io-ts";
+import {
+  CreateItemDataCodec,
+  ExtensionRequest,
+  ExtensionResponse,
+} from "./index";
 
 const OPExtensions = [
   "dppgmdbiimibapkepcbdbmkaabgiofem",
@@ -29,6 +34,16 @@ export const isOPInstalled = async (minimumExtensionVersion?: number) => {
     } catch {}
   }
   return false;
+};
+
+export const createOpItem = async (
+  extensionId: string,
+  data: t.TypeOf<typeof CreateItemDataCodec>
+): Promise<Extract<ExtensionResponse, { name: "create-item" }>> => {
+  return await sendExternalMessage(extensionId, {
+    name: "create-item",
+    data,
+  });
 };
 
 function sendExternalMessage<
