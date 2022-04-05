@@ -29,7 +29,7 @@ export const isOPInstalled = async (minimumExtensionVersion?: number) => {
         // If the extension found does not meet the minimum version then continue to the next
         if (
           typeof minimumExtensionVersion === "number" &&
-          minimumExtensionVersion < helloResponse.data.buildNumber
+          minimumExtensionVersion < helloResponse.buildNumber
         ) {
           continue;
         }
@@ -52,7 +52,7 @@ export const encryptValue = async (
 
     const cryptoKey = await window.crypto.subtle.importKey(
       "jwk",
-      encryptionKeyResponse.data,
+      encryptionKeyResponse,
       {
         name: "RSA-OAEP",
         hash: { name: "SHA-1" },
@@ -108,7 +108,7 @@ export async function createOPItem(
 
 function sendExternalMessage<
   Request extends ExtensionRequest,
-  Response extends Extract<ExtensionResponse, { name: Request["name"] }>
+  Response extends Extract<ExtensionResponse, { name: Request["name"] }>["data"]
 >(extensionId: string, message: Request): Promise<Response> {
   return new Promise<Response>((resolve, reject) => {
     // TODO add timeout / reject
