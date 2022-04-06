@@ -7,6 +7,7 @@ import {
   EncryptedValueCodec,
 } from "./index";
 import { CategoryReadable, CategoryUuidDictionary } from "./category";
+import * as base64js from "base64-js";
 
 const OPExtensions = [
   "dppgmdbiimibapkepcbdbmkaabgiofem",
@@ -66,13 +67,10 @@ export const encryptValue = async (
       cryptoKey,
       value
     );
-    const encryptedValue = new TextDecoder().decode(
-      new Uint8Array(encryptResult)
-    );
 
     return {
       type: "encrypted",
-      value: encryptedValue,
+      value: base64js.fromByteArray(new Uint8Array(encryptResult)),
     };
   } catch {
     throw new Error("Unable to encrypt value provided");
