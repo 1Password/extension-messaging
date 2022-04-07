@@ -2,7 +2,7 @@
 
 Using the cross-extension communication provided by [`browser.runtime.sendMessage`](https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/runtime/sendMessage), you can save data within 1Password.
 
-Below outlines the messages that 1Password can accept and the response you can expect. Included in `demo-extension/` is types can be integrated into an extension for communication with 1Password and a sample extension for how this works.
+Below we outline the messages that 1Password can accept and the response you can expect. Included in `demo-extension/` are types that can be integrated into an extension for communication with 1Password and a sample extension for how this works.
 
 To use this API and see this demo in action, contact us.
 
@@ -51,7 +51,7 @@ A save request needs these values:
 		<td><code>fields</code></td> <td>array</td> <td>Each object in the array has these properties:
 		<ul>
 			<li><code>autocomplete</code> (string): The type of field to fill.</li>
-			<li><code>value</code> (string): The value to be filled in the field.</li>
+			<li><code>value</code> (string or object*): The value to be filled in the field. Objects represent encyrpted values; to encrypt a value, <a href="#encrypted">use the built-in `encryptValue` function</a>.</li>
 		</ul>
 		<p class="note">Use the autocomplete field name and values defined in the "Autofill" section of the <a href="https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#autofill">HTML Living Standard</a>.</p>
 		</td>
@@ -85,13 +85,51 @@ Use helper function `createOPItem` in this package and pass in:
  - your  <a href="#save-request"> save request</a>
 
 ```ts
-createOPItem("dghdojbkjhnklbpkdaibdccddilifddb", "login", {
-    title: "Sample Item",
+createOPItem("dghdojbkjhnklbpkdaibdccddilifddb", "credit-card", {
+    title: "Virtual Credit Card Item",
     fields: [
-      { autocomplete: "username", value: "wendy.appleseed@1password.com" },
-      { autocomplete: "current-password", value: "its-a-secret" },
-    ],
-    notes: "Item saved while testing the integration.",
+          {
+            autocomplete: "cc-name",
+            value: "Wendy Appleseed",
+          },
+          {
+            autocomplete: "cc-type",
+            value: "visa",
+          },
+          {
+            autocomplete: "cc-number",
+            value: "4012888888881881",
+          },
+          {
+            autocomplete: "cc-exp",
+            value: "202401",
+          },
+          {
+            autocomplete: "cc-csc",
+            value: "714",
+          },
+          {
+            autocomplete: "street-address",
+            value: "512 Main Street",
+          },
+          {
+            autocomplete: "address-level2",
+            value: "Cambridge",
+          },
+          {
+            autocomplete: "address-level1",
+            value: "MA",
+          },
+          {
+            autocomplete: "postal-code",
+            value: "02114",
+          },
+          {
+            autocomplete: "country",
+            value: "US",
+          },
+        ],
+    notes: "Credit card item saved while testing the integration.",
   });
 ```
 
@@ -103,7 +141,7 @@ createOPItem("dghdojbkjhnklbpkdaibdccddilifddb", "login", {
 
 #### Encrypted
 
-If you want to encrypt any of the values in your Save Request, first use our built-in `encryptValue` function to modify any values in your request. `encryptValue` accepts:
+To encrypt any of the values in your Save Request, first use our built-in `encryptValue` function to modify them. `encryptValue` accepts:
 - the ID of the extension you want to message
 - a `Uint8Array` of the value you want to encrypt. You can use a TextEncoder to turn any string into a `Uint8Array`
 
@@ -117,7 +155,7 @@ If you want to encrypt any of the values in your Save Request, first use our bui
 
 *Request:*
 
-Then make your request with the `createOPItem` helper function:
+Once you've encyrpted the values you want to encyrpt, send your request with the `createOPItem` helper function:
 
   ```ts
   createOPItem("dghdojbkjhnklbpkdaibdccddilifddb", "crypto-wallet", {
@@ -139,9 +177,14 @@ Then make your request with the `createOPItem` helper function:
 { "name": "create-item", "data": { "created": true } }
 ```
 
+## Request to be added to the list of allowed extensions
+
+The extension-messaging API is only compatible with extensions approved by 1Password. To request that your extension ID be added to the list, to request support for an <a href="#appendix-supported-item-templates">item type</a> not listed below, or for more information about the API, contact the 1Password Partnerships team at [support+partnerships@1password.com](mailto:support+partnerships@1password.com).
+
 ## Appendix: Supported item templates
 
 | Template | Code | Template   | Code | Template             | Code    |
 | -------- | ---- | ---------- | ---- | -------------------- | ------- |
 | Credit Card | `credit-card` | API Credential | `api-credential` | Crypto Wallet | `crypto-wallet` | 
-| Login  | `login` | password | `password` | 
+| Login  | `login` | Password | `password` | 
+
