@@ -17,7 +17,11 @@ export const SaveRequestCodec = t.readonly(
       t.readonly(
         t.strict({
           autocomplete: AutocompleteType,
-          value: t.union([t.string, EncryptedValueCodec, t.undefined]),
+          value: t.union([
+            t.string,
+            t.array(t.readonly(t.number)),
+            t.undefined,
+          ]),
         })
       )
     ),
