@@ -2,6 +2,8 @@ import * as t from "io-ts";
 import { AutocompleteType } from "./autocomplete";
 import { CategoryUuid } from "./category";
 
+export { isOPInstalled, createOPItem } from "./helpers";
+
 export const SaveRequestCodec = t.readonly(
   t.strict({
     title: t.string,
@@ -9,7 +11,11 @@ export const SaveRequestCodec = t.readonly(
       t.readonly(
         t.strict({
           autocomplete: AutocompleteType,
-          value: t.union([t.string, t.undefined]),
+          value: t.union([
+            t.string,
+            t.array(t.readonly(t.number)),
+            t.undefined,
+          ]),
         })
       )
     ),
