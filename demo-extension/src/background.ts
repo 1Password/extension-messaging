@@ -18,16 +18,12 @@ async function sendCreateCryptoItem(extensionId: string) {
       { autocomplete: "crypto-address", value: "address-goes-here" },
       {
         autocomplete: "crypto-recovery-seed",
-        // Sample string: 'sample-recovery-phrase'
         value: Array.from(
-          new Uint8Array([
-            115, 97, 109, 112, 108, 101, 45, 114, 101, 99, 111, 118, 101, 114,
-            121, 45, 112, 104, 114, 97, 115, 101,
-          ])
+          new TextEncoder().encode("sample-recovery-phrase ✨")
         ),
       },
     ],
-    notes: "Item saved while testing the integration.",
+    notes: undefined,
   });
 }
 

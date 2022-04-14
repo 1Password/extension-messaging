@@ -30,7 +30,6 @@ Response:
 
 Sent from your extension to 1Password which opens the 1Password Save Dialog prepopulated with the provided data. The `created` field in the response indicates if the user chose to save the item.
 
-
 #### Save Request
 
 To save an item to 1Password, you'll need to build a save request:
@@ -51,7 +50,7 @@ A save request needs these values:
 		<td><code>fields</code></td> <td>array</td> <td>Each object in the array has these properties:
 		<ul>
 			<li><code>autocomplete</code> (string): The type of field to fill.</li>
-			<li><code>value</code> (string or object*): The value to be filled in the field. Objects represent encyrpted values; to encrypt a value, <a href="#encrypted">use the built-in `encryptValue` function</a>.</li>
+			<li><code>value</code> (string or number[]): The value to be filled in the field expressed as the string value or as an array of numbers representing the UTF-8 code points. </li>
 		</ul>
 		<p class="note">Use the autocomplete field name and values defined in the "Autofill" section of the <a href="https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#autofill">HTML Living Standard</a>.</p>
 		</td>
@@ -62,7 +61,7 @@ A save request needs these values:
 	</tbody>
 </table>
 
-For example: 
+For example:
 
 ```ts
 {
@@ -75,106 +74,94 @@ For example:
   });
 ```
 
-#### Unencrypted
-
-*Request:*
+_Request:_
 
 Use helper function `createOPItem` in this package and pass in:
- - the ID of the extension where you want to send the message
- - the <a href="#appendix-supported-item-templates">supported item template code</a> for the 1Password item you want to save
- - your  <a href="#save-request"> save request</a>
+
+- the ID of the extension where you want to send the message
+- the <a href="#appendix-supported-item-templates">supported item template code</a> for the 1Password item you want to save
+- your <a href="#save-request"> save request</a>
+
+##### Sample Credit Card Request
 
 ```ts
 createOPItem("dghdojbkjhnklbpkdaibdccddilifddb", "credit-card", {
-    title: "Virtual Credit Card Item",
-    fields: [
-          {
-            autocomplete: "cc-name",
-            value: "Wendy Appleseed",
-          },
-          {
-            autocomplete: "cc-type",
-            value: "visa",
-          },
-          {
-            autocomplete: "cc-number",
-            value: "4012888888881881",
-          },
-          {
-            autocomplete: "cc-exp",
-            value: "202401",
-          },
-          {
-            autocomplete: "cc-csc",
-            value: "714",
-          },
-          {
-            autocomplete: "street-address",
-            value: "512 Main Street",
-          },
-          {
-            autocomplete: "address-level2",
-            value: "Cambridge",
-          },
-          {
-            autocomplete: "address-level1",
-            value: "MA",
-          },
-          {
-            autocomplete: "postal-code",
-            value: "02114",
-          },
-          {
-            autocomplete: "country",
-            value: "US",
-          },
-        ],
-    notes: "Credit card item saved while testing the integration.",
-  });
+  title: "Virtual Credit Card Item",
+  fields: [
+    {
+      autocomplete: "cc-name",
+      value: "Wendy Appleseed",
+    },
+    {
+      autocomplete: "cc-type",
+      value: "visa",
+    },
+    {
+      autocomplete: "cc-number",
+      value: "4012888888881881",
+    },
+    {
+      autocomplete: "cc-exp",
+      value: "202401",
+    },
+    {
+      autocomplete: "cc-csc",
+      value: "714",
+    },
+    {
+      autocomplete: "street-address",
+      value: "512 Main Street",
+    },
+    {
+      autocomplete: "address-level2",
+      value: "Cambridge",
+    },
+    {
+      autocomplete: "address-level1",
+      value: "MA",
+    },
+    {
+      autocomplete: "postal-code",
+      value: "02114",
+    },
+    {
+      autocomplete: "country",
+      value: "US",
+    },
+  ],
+  notes: "Credit card item saved while testing the integration.",
+});
 ```
 
-*Response:*
+_Response:_
 
 ```json
-{ "name": "create-item", "data": { "created": true } }
+{ "name": "create-item", "data": { "saved": true } }
 ```
 
-#### Encrypted
-
-To encrypt any of the values in your Save Request, first use our built-in `encryptValue` function to modify them. `encryptValue` accepts:
-- the ID of the extension you want to message
-- a `Uint8Array` of the value you want to encrypt. You can use a TextEncoder to turn any string into a `Uint8Array`
+##### Sample Crypto Wallet Request
 
 ```ts
- const encryptedRecoverySeed = await encryptValue(
-    "dghdojbkjhnklbpkdaibdccddilifddb",
-    new TextEncoder().encode('sample-recovery-phrase')
-  );
-
+createOPItem("dghdojbkjhnklbpkdaibdccddilifddb", "crypto-wallet", {
+  title: "Sample Crypto Wallet",
+  fields: [
+    {
+      autocomplete: "crypto-address",
+      value: "sample-wallet-address",
+    },
+    {
+      autocomplete: "crypto-recovery-seed",
+      value: Array.from(new TextEncoder().encode("sample-recovery-phrase ✨")),
+    },
+  ],
+  notes: "Credit card item saved while testing the integration.",
+});
 ```
 
-*Request:*
-
-Once you've encyrpted the values you want to encyrpt, send your request with the `createOPItem` helper function:
-
-  ```ts
-  createOPItem("dghdojbkjhnklbpkdaibdccddilifddb", "crypto-wallet", {
-    title: "Crypto Wallet",
-    fields: [
-      { autocomplete: "crypto-address", value: "address-goes-here" },
-      {
-        autocomplete: "crypto-recovery-seed",
-        value: encryptedRecoverySeed,
-      },
-    ],
-    notes: "Item saved while testing the integration.",
-  });
-```
-
-*Response:*
+_Response:_
 
 ```json
-{ "name": "create-item", "data": { "created": true } }
+{ "name": "create-item", "data": { "saved": true } }
 ```
 
 ## Request to be added to the list of allowed extensions
@@ -183,8 +170,10 @@ The extension-messaging API is only compatible with extensions approved by 1Pass
 
 ## Appendix: Supported item templates
 
-| Template | Code | Template   | Code | Template             | Code    |
-| -------- | ---- | ---------- | ---- | -------------------- | ------- |
-| Credit Card | `credit-card` | API Credential | `api-credential` | Crypto Wallet | `crypto-wallet` | 
-| Login  | `login` | Password | `password` | 
-
+| Template       | Code             |
+| -------------- | ---------------- |
+| API Credential | `api-credential` |
+| Credit Card    | `credit-card`    |
+| Crypto Wallet  | `crypto-wallet`  |
+| Login          | `login`          |
+| Password       | `password`       |
