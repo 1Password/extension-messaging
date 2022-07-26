@@ -108,19 +108,38 @@ function sendExternalMessage<
   Request extends ExtensionRequest,
   Response extends Extract<ExtensionResponse, { name: Request["name"] }>["data"]
 >(extensionId: string, message: Request): Promise<Response> {
-  return new Promise<Response>((resolve, reject) => {
-    // TODO add timeout / reject
-    try {
-      chrome.runtime.sendMessage(
-        extensionId,
-        JSON.stringify(message),
-        (response) => {
-          // console.log("Response:", response);
-          resolve(response);
-        }
-      );
-    } catch {
-      reject("not found");
-    }
+  // Attempt to send a message, waiting up to 5 seconds before rejecting the promise
+  return promiseTimeout(
+    new Promise<Response>((resolve, reject) => {
+      try {
+        chrome.runtime.sendMessage(
+          extensionId,
+          JSON.stringify(message),
+          (response) => {
+            if (chrome.runtime.lastError) {
+              reject();
+            } else {
+              resolve(response);
+            }
+          }
+        );
+      } catch {
+        reject();
+      }
+    }),
+    5_000
+  );
+}
+
+function promiseTimeout<T>(promise: Promise<T>, ms: number) {
+  let timeoutId: number;
+  const timeout = new Promise<never>((_resolve, reject) => {
+    timeoutId = window.setTimeout(() => {
+      console.warn(`Promise timed out.`);
+      reject();
+    }, ms);
   });
+  return Promise.race([promise, timeout]).finally(() =>
+    window.clearTimeout(timeoutId)
+  );
 }
