@@ -79,14 +79,14 @@ function sendExternalMessage<
           JSON.stringify(message),
           (response) => {
             if (chrome.runtime.lastError) {
-              reject();
+              reject(new Error(chrome.runtime.lastError.message));
             } else {
               resolve(response);
             }
           }
         );
       } catch {
-        reject();
+        reject(new Error("Unable to send message to requested extension"));
       }
     }),
     5_000
