@@ -8,6 +8,7 @@
   "license": "LicenseRef-1Password-Proprietary",
   "dependencies": {
     "fp-ts": "^2.11.5",
-    "io-ts": "^2.2.16"
+    "io-ts": "^2.2.16",
+    "tslib": "2.3.1"
   }
 }
