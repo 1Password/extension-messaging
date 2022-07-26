@@ -4,10 +4,8 @@ import {
   ExtensionResponse,
   SaveRequestCodec,
   CreateItemResponseDataCodec,
-  EncryptedValueCodec,
 } from "./index";
 import { CategoryReadable, CategoryUuidDictionary } from "./category";
-import * as base64js from "base64-js";
 
 const OPExtensions = [
   "dppgmdbiimibapkepcbdbmkaabgiofem",
@@ -42,41 +40,6 @@ export const isOPInstalled = async (minimumExtensionVersion?: number) => {
   return false;
 };
 
-export const encryptValue = async (
-  extensionId: string,
-  value: Uint8Array
-): Promise<t.TypeOf<typeof EncryptedValueCodec>> => {
-  try {
-    const encryptionKeyResponse = await sendExternalMessage(extensionId, {
-      name: "get-encryption-key",
-    });
-
-    const cryptoKey = await window.crypto.subtle.importKey(
-      "jwk",
-      encryptionKeyResponse,
-      {
-        name: "RSA-OAEP",
-        hash: { name: "SHA-1" },
-      },
-      true,
-      ["encrypt"]
-    );
-
-    const encryptResult = await window.crypto.subtle.encrypt(
-      "RSA-OAEP",
-      cryptoKey,
-      value
-    );
-
-    return {
-      type: "encrypted",
-      value: base64js.fromByteArray(new Uint8Array(encryptResult)),
-    };
-  } catch {
-    throw new Error("Unable to encrypt value provided");
-  }
-};
-
 export async function createOPItem(
   extensionId: string,
   itemType: t.TypeOf<typeof CategoryReadable>,
@@ -84,14 +47,13 @@ export async function createOPItem(
 ): Promise<t.TypeOf<typeof CreateItemResponseDataCodec>> {
   if (CategoryUuidDictionary[itemType]) {
     const categoryUuid = CategoryUuidDictionary[itemType];
-    const response = (await sendExternalMessage(extensionId, {
+    return await sendExternalMessage(extensionId, {
       name: "create-item",
       data: {
         saveRequest,
         type: categoryUuid,
       },
-    })) as unknown;
-    return response as t.TypeOf<typeof CreateItemResponseDataCodec>;
+    });
   } else {
     console.error(
       `Item type not valid, must be one of the following: ${CategoryReadable.types

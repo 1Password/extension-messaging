@@ -7,7 +7,6 @@
   "private": true,
   "license": "LicenseRef-1Password-Proprietary",
   "dependencies": {
-    "base64-js": "^1.5.1",
     "fp-ts": "^2.11.5",
     "io-ts": "^2.2.16",
     "tslib": "2.3.1"
